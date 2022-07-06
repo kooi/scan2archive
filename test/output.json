@@ -1,0 +1,58 @@
+{
+    "scans": [
+        {
+            "filename": "../test/scan/KM_458e22070410180.pdf",
+            "raw_data": "2022\nsk\nt3-2\n5sk3",
+            "status": "SUCCESS",
+            "year": "2022",
+            "subject": "sk",
+            "testcode": "t3-2",
+            "group": "5sk3"
+        },
+        {
+            "filename": "../test/scan/KM_458e22070410181.pdf",
+            "raw_data": "2022\nsk\nt3-2\n5sk3",
+            "status": "SUCCESS",
+            "year": "2022",
+            "subject": "sk",
+            "testcode": "t3-2",
+            "group": "5sk3"
+        },
+        {
+            "filename": "../test/scan/KM_458e22070410182_0001.jpg",
+            "raw_data": "2022\nsk\nt3-2\n5sk3",
+            "status": "SUCCESS",
+            "year": "2022",
+            "subject": "sk",
+            "testcode": "t3-2",
+            "group": "5sk3"
+        },
+        {
+            "filename": "../test/scan/KM_458e22070410182_0002.jpg",
+            "raw_data": "2022\nsk\nt3-2\n5sk3",
+            "status": "SUCCESS",
+            "year": "2022",
+            "subject": "sk",
+            "testcode": "t3-2",
+            "group": "5sk3"
+        },
+        {
+            "filename": "../test/scan/KM_458e22070410182_0001.png",
+            "raw_data": "2022\nsk\nt3-2\n5sk3",
+            "status": "SUCCESS",
+            "year": "2022",
+            "subject": "sk",
+            "testcode": "t3-2",
+            "group": "5sk3"
+        },
+        {
+            "filename": "../test/clean/2022_sk_t3-1_5sk3_v1.png",
+            "raw_data": "2022\nsk\nt3-1\n5sk3",
+            "status": "SUCCESS",
+            "year": "2022",
+            "subject": "sk",
+            "testcode": "t3-1",
+            "group": "5sk3"
+        }
+    ]
+}

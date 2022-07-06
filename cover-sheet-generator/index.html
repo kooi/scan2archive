@@ -1,0 +1,342 @@
+<html>
+
+<head>
+    <script src="./js/qrcode.js"></script>
+    <script>
+        // QRCode data format
+        var QR_DATA_SEPARATOR = '\n'
+        var QR_EXPECTED_DATA = ['year', 'subject', 'testcode', 'group']
+        var INPUT_PREFIX = 'input-';
+        var OUTPUT_PREFIX = 'output-';
+        var LABEL_POSTFIX = '-label';
+
+        // DONE: Use SETTINGS for autofilling
+        // TODO: Save previous and select based on previous
+        // V2: Request SETTINGS from SOM
+        var SETTINGS = {
+            // Autoselect based on date (set a 'cutoff' value)
+            year:
+            {
+                label: 'Schooljaar',
+                values: [
+                    {
+                        value: 2022,
+                        text: '2021-2022',
+                    },
+                    {
+                        value: 2023,
+                        text: '2022-2023',
+                    },
+                    {
+                        value: 2024,
+                        text: '2023-2024',
+                    },
+                    {
+                        value: 2025,
+                        text: '2024-2025',
+                    },
+                ]
+            },
+            // Autoselect based on previous ('selectedSETTINGS')
+            subject:
+            {
+                label: 'Vak',
+                values: [
+                    // 'act',
+                    'ak',
+                    'anw',
+                    // 'aux',
+                    'beeld',
+                    'bi',
+                    // 'combi',
+                    'DU',
+                    'ec',
+                    'EN',
+                    'FA',
+                    'filo',
+                    'GR',
+                    'gs',
+                    'LA',
+                    // 'lo',
+                    // 'ment',
+                    'ml',
+                    'mu',
+                    'na',
+                    'NE',
+                    'nlt',
+                    'pr',
+                    // 'rutl',
+                    'sk',
+                    'te',
+                    'wa',
+                    'wb',
+                    // 'wb-b',
+                    'wc',
+                    'wd',
+                    // 'wi',
+                ],
+                // [
+                //     {
+                //         value: 'ak',
+                //         text: 'Aardrijkskunde',
+                //     },
+                //     {
+                //         value: 'bi',
+                //         text: 'Biologie',
+                //     },
+                // ]
+            },
+            // Values may be an array of strings
+            // Use a checkbox for herkansing? 
+            // No, list all explicitly (exceptions can be added simply)
+            // TODO: Add all data (current is a guess)
+            // V2: Extract from SOM
+            testcode:
+            {
+                label: 'Toetscode',
+                values: [
+                    't1-1', 't1-2',
+                    't2-1', 't2-2',
+                    't3-1', 't3-2',
+                    't4-1', 't4-2',
+                    't5-1', 't5-2',
+                    't6-1', 't6-2',
+                    't7-1', 't7-2',
+                    't8-1', 't8-2',
+                    't9-1', 't9-2',
+                    't10-1', 't10-2',
+                    't11-1', 't11-2',
+                    'p1',
+                    'p2',
+                    'p3',
+                    'p4',
+                    'm1',
+                    'm2',
+                    'm3',
+                    'm4',
+                    'm5-1', 'm5-2',
+                    'm6-1', 'm6-2',
+                    'm7-1', 'm7-2',
+                    'm8-1', 'm8-2',
+                    'm9-1', 'm9-2',
+                    'm10-1', 'm10-2',
+                    'm11-1', 'm11-2',
+                ]
+            },
+            // Values may be a list
+            // TODO: Add all data
+            // V2: Extract from SOM
+            group:
+            {
+                label: 'Groep',
+                values: [
+                    '5a', '5b', '5c', '5d', '5e',
+                    '5.ak1', '5.ak2', '5.ak3', '5.ak4',
+                ]
+            },
+
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        @media print {
+            .screen-visible {
+                display: none;
+            }
+        }
+
+        @media screen {
+            .screen-visible {
+                display: block;
+            }
+
+            h1 {
+                margin: 0;
+                text-align: center;
+            }
+
+            .data-input {
+                background-color: lightgray;
+                /* width: 100%; */
+                max-width: 640px;
+                min-width: 420px;
+                border-radius: 5px;
+                padding: 12px 12px 4px 12px;
+                margin-bottom: 12px;
+            }
+
+            select {
+                width: 100%;
+                padding: 12px;
+                margin: 4px 0px 12px 0px;
+                display: inline-block;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+
+            input[type=button] {
+                background-color: rgb(32, 179, 32);
+                width: 100%;
+                padding: 12px;
+                display: inline-block;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+
+            input[type=button]:hover {
+                background-color: rgb(82, 209, 82);
+            }
+
+            .data-output {
+                visibility: hidden;
+                border-width: 2px;
+                border-style: solid;
+                border-color: rgb(32, 179, 32);
+                border-radius: 5px;
+                display: grid;
+                grid-template-columns: 132px auto auto;
+                grid-template-rows: auto auto auto auto;
+                /* width: 100%; */
+                max-width: 640px;
+                min-width: 420px;
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            #output-qr {
+                display: grid;
+                grid-row: 1 / span 4;
+            }
+
+            .data-output>div {
+                font-size: larger;
+                /* border-style: solid; */
+            }
+
+            .text-align-left {
+                text-align: left;
+            }
+
+            .text-align-right {
+                text-align: right;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="screen-visible">
+        <div class="data-input">
+            <h1>PTA voorblad</h1>
+            <form>
+                <label for="input-year">Schooljaar</label>
+                <select id="input-year">
+                    <!-- <option value="2022">2021-2022</option> -->
+                </select>
+
+                <label for="input-subject">Vak</label>
+                <select id="input-subject">
+                    <!-- <option value="ak">Aardrijkskunde</option> -->
+                </select>
+
+                <label for="input-testcode">Toetscode</label>
+                <select id="input-testcode">
+                    <!-- <option value="t3-1">t3-1</option> -->
+                </select>
+
+                <label for="input-group">Groep</label>
+                <select id="input-group">
+                    <!-- <option value="5sk3">5sk3</option> -->
+                </select>
+
+                <input type="button" id="button-generate" value="Generate">
+            </form>
+        </div>
+    </div>
+
+    <div class="data-output">
+        <div id="output-qr"></div>
+
+        <div class="text-align-right" id="output-year-label"></div>
+        <div class="text-align-left" id="output-year"></div>
+
+        <div class="text-align-right" id="output-subject-label"></div>
+        <div class="text-align-left" id="output-subject"></div>
+
+        <div class="text-align-right" id="output-testcode-label"></div>
+        <div class="text-align-left" id="output-testcode"></div>
+
+        <div class="text-align-right" id="output-group-label"></div>
+        <div class="text-align-left" id="output-group"></div>
+    </div>
+</body>
+<script>
+    window.addEventListener('load', (event) => {
+        var qrcode = new QRCode(document.getElementById("output-qr"), {
+            text: "",
+            width: 128,
+            height: 128,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // Fill form with SETTINGS data
+        for (i in QR_EXPECTED_DATA) {
+            let key = QR_EXPECTED_DATA[i];
+            let element = document.getElementById(`${INPUT_PREFIX}${key}`);
+            // console.log(element);
+
+            let values = SETTINGS[key].values;
+            SETTINGS[key].values.forEach((el) => {
+                let opt = document.createElement('option');
+                if (typeof values[0] == 'string') {
+                    // add .text as.text
+                    opt.value = el;
+                    opt.text = el;
+                } else if (typeof values[0] == 'object') {
+                    // add value as .text and .value
+                    opt.value = el.value;
+                    opt.text = el.text;
+                } else {
+                    console.log(`Unrecognized type: ${typeof values[0]}`);
+                }
+                element.add(opt, null);
+            });
+        }
+
+        // Generate QR when clicking
+        document.getElementById('button-generate').addEventListener(
+            'click', () => {
+                // Clear previous QR
+                qrcode.clear();
+
+                // Gather qr data
+                let qrdata = [];
+                for (i in QR_EXPECTED_DATA) {
+                    let key = QR_EXPECTED_DATA[i];
+                    let value = document.getElementById(`${INPUT_PREFIX}${key}`).value;
+                    qrdata.push(value);
+                    let text = ` - ${value}`;
+                    let textElement = document.getElementById(`${OUTPUT_PREFIX}${key}`);
+                    textElement.textContent = text;
+                    let label = `${SETTINGS[key].label} -`;
+                    let labelElement = document.getElementById(`${OUTPUT_PREFIX}${key}${LABEL_POSTFIX}`);
+                    labelElement.textContent = label;
+                }
+
+                // Create new QR
+                let qrdata_string = qrdata.join(QR_DATA_SEPARATOR);
+                qrcode.makeCode(qrdata_string);
+                document.getElementsByClassName('data-output')[0].style.visibility = 'visible';
+            });
+    });
+</script>
+
+</html>
